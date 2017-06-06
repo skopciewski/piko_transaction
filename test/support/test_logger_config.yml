@@ -1,0 +1,6 @@
+---
+:logger2r_config:
+  :default:
+    :device: "stdout"
+    :severity_level: debug
+
