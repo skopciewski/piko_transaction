@@ -71,7 +71,7 @@ module PikoTransaction
       action = choose_do_action
       return terminate("Bad 'do' action") unless action.respond_to? :call
       logger.debug { "Executing do action" }
-      action.()
+      action.call
     end
 
     def choose_do_action
@@ -81,7 +81,7 @@ module PikoTransaction
     def execute_undo_action
       return true unless @undo_action.respond_to? :call
       logger.debug { "Executing undo action" }
-      @undo_action.()
+      @undo_action.call
     end
   end
 end

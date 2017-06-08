@@ -5,11 +5,10 @@ require "piko_transaction/custom_command.rb"
 
 module PikoTransaction
   class CustomCommandTest < Minitest::Test
-
     def setup
       @done = false
       @undone = false
-      @cmd = CustomCommand.new ->{ @done = true }, -> { @undone = true }
+      @cmd = CustomCommand.new -> { @done = true }, -> { @undone = true }
     end
 
     def test_that_can_call_do
@@ -37,18 +36,18 @@ module PikoTransaction
     end
 
     def test_that_do_command_returns_false_when_block_returns_false
-      @cmd = CustomCommand.new ->{ false }, -> { @undone = true }
+      @cmd = CustomCommand.new -> { false }, -> { @undone = true }
       refute @cmd.do
     end
 
     def test_that_can_not_call_undo_after_bad_do
-      @cmd = CustomCommand.new ->{ false }, -> { @undone = true }
+      @cmd = CustomCommand.new -> { false }, -> { @undone = true }
       @cmd.do
       refute @cmd.undo
     end
 
     def test_that_can_not_call_undo_when_error
-      @cmd = CustomCommand.new ->{ @done = true }, -> { false }
+      @cmd = CustomCommand.new -> { @done = true }, -> { false }
       @cmd.do
       refute @cmd.undo
     end
@@ -65,7 +64,7 @@ module PikoTransaction
     end
 
     def test_that_undo_without_block_returns_true
-      @cmd = CustomCommand.new ->{ @done = true }
+      @cmd = CustomCommand.new -> { @done = true }
       @cmd.do
       assert @cmd.undo
     end
