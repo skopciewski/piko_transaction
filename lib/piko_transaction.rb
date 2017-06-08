@@ -18,5 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require "piko_transaction/transaction"
+require "piko_transaction/transaction_holder"
 require "piko_transaction/insert_command"
 require "piko_transaction/delete_command"
+require "piko_transaction/custom_command"
