@@ -18,5 +18,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module PikoTransaction
-  VERSION = "1.1.0"
+  VERSION = "2.0.0"
 end

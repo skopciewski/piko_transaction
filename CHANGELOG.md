@@ -1,3 +1,7 @@
+### 2.0.0 (2017.06.08)
+
+* change transaction interface: run -> do, roll_back -> undo
+
 ### 1.1.0 (2017.06.08)
 
 * add custom command
