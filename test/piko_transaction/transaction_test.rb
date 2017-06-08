@@ -43,34 +43,34 @@ module PikoTransaction
 
     def test_that_transaction_returns_true
       @transaction.add @cmd1
-      assert_equal true, @transaction.run
+      assert_equal true, @transaction.do
     end
 
     def test_that_transaction_succesfully_run_first_command
       @transaction.add @cmd1
       @transaction.add @cmd2
-      @transaction.run
+      @transaction.do
       assert @cmd1.done && @cmd2.done
     end
 
     def test_that_transaction_do_not_undo_first_command
       @transaction.add @cmd1
       @transaction.add @cmd2
-      @transaction.run
+      @transaction.do
       refute @cmd1.undone && @cmd2.undone
     end
 
     def test_that_transaction_undo_first_command_when_the_second_is_bad
       @transaction.add @cmd1
       @transaction.add @cmd_bad
-      @transaction.run
+      @transaction.do
       assert_equal true, @cmd1.undone
     end
 
     def test_that_transaction_do_not_undo_second_command_when_the_second_is_bad
       @transaction.add @cmd1
       @transaction.add @cmd_bad
-      @transaction.run
+      @transaction.do
       assert_equal false, @cmd_bad.undone
     end
 
@@ -78,7 +78,7 @@ module PikoTransaction
       @transaction.add @cmd1
       @transaction.add @cmd_bad
       @transaction.add @cmd2
-      @transaction.run
+      @transaction.do
       assert_equal false, @cmd2.done
     end
 
@@ -86,28 +86,28 @@ module PikoTransaction
       @transaction.add @cmd1
       @transaction.add @cmd2
       @transaction.add @cmd_bad
-      @transaction.run
+      @transaction.do
       assert_equal true, @cmd2.undo
     end
 
     def test_that_transaction_return_false_with_bad_command
       @transaction.add @cmd1
       @transaction.add @cmd_bad
-      assert_equal false, @transaction.run
+      assert_equal false, @transaction.do
     end
 
     def test_that_transaction_return_false_with_bad_command_and_bad_undo
       @transaction.add @cmd1
       @transaction.add @cmd_bad_undo
       @transaction.add @cmd_bad
-      assert_equal false, @transaction.run
+      assert_equal false, @transaction.do
     end
 
     def test_that_transaction_do_not_undo_firts_command_when_the_second_undo_is_bad
       @transaction.add @cmd1
       @transaction.add @cmd_bad_undo
       @transaction.add @cmd_bad
-      @transaction.run
+      @transaction.do
       assert_equal false, @cmd1.undone
     end
 
@@ -115,16 +115,25 @@ module PikoTransaction
       transaction = Transaction.new do |t|
         t.add @cmd1
       end
-      transaction.run
+      transaction.do
       assert_equal true, @cmd1.done
     end
 
     def test_that_it_is_possible_to_roll_back_all_commands
       @transaction.add @cmd1
       @transaction.add @cmd2
-      @transaction.run
-      @transaction.roll_back
+      @transaction.do
+      @transaction.undo
       assert @cmd1.undone && @cmd2.undone
+    end
+
+    def test_that_transaction_can_run_transaction
+      transaction2 = Transaction.new
+      transaction2.add @cmd2
+      @transaction.add @cmd1
+      @transaction.add transaction2
+      @transaction.do
+      assert @cmd1.done && @cmd2.done
     end
   end
 end

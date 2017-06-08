@@ -34,20 +34,20 @@ module PikoTransaction
       @commands << command
     end
 
-    def run
+    def do
       logger.info { format "Start transaction with commands: %s", @commands.count }
       return true if run_commands
-      terminate_and_roll_back
+      terminate_and_undo
     end
 
-    def roll_back
+    def undo
       logger.info { format "Rolling back transaction with commands: %s", @done.count }
       undo_done_commands
     end
 
     private
 
-    def terminate_and_roll_back
+    def terminate_and_undo
       logger.error { "Could not finalize transaction!" }
       undo_done_commands
       false
