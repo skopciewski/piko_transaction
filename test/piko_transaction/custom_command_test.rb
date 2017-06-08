@@ -74,5 +74,11 @@ module PikoTransaction
       @cmd = CustomCommand.new :doo
       refute @cmd.do
     end
+
+    def test_that_do_command_can_be_passed_as_block
+      @cmd = CustomCommand.new { @done = true }
+      @cmd.do
+      assert @done
+    end
   end
 end

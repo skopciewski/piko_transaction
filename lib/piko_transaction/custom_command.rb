@@ -23,9 +23,10 @@ module PikoTransaction
   class CustomCommand
     include Logger
 
-    def initialize(do_action, undo_action = nil)
+    def initialize(do_action = nil, undo_action = nil, &alternative_do_action)
       @do_action = do_action
       @undo_action = undo_action
+      @alternative_do_action = alternative_do_action
       @done = false
     end
 
@@ -67,9 +68,14 @@ module PikoTransaction
     end
 
     def execute_do_action
-      return terminate("Can not call 'do' action") unless @do_action.respond_to? :call
+      action = choose_do_action
+      return terminate("Bad 'do' action") unless action.respond_to? :call
       logger.debug { "Executing do action" }
-      @do_action.()
+      action.()
+    end
+
+    def choose_do_action
+      @do_action || @alternative_do_action
     end
 
     def execute_undo_action
