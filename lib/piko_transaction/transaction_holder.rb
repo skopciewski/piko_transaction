@@ -17,8 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require "piko_transaction/logger"
 require "piko_transaction/transaction"
-require "piko_transaction/transaction_holder"
-require "piko_transaction/insert_command"
-require "piko_transaction/delete_command"
-require "piko_transaction/custom_command"
+
+module PikoTransaction
+  class TransactionHolder
+    include Logger
+
+    def initialize
+      @transactions = {}
+    end
+
+    def method_missing(method_name, *args, &block)
+      logger.debug { format "Looking for transaction '%s'", method_name }
+      return super unless valid_method_name?(method_name)
+      @transactions[method_name] ||= Transaction.new
+    end
+
+    private
+
+    def respond_to_missing?(method_name, include_private = false)
+      return true if valid_method_name?(method_name)
+      super
+    end
+
+    def valid_method_name?(name)
+      /^\w+$/.match? name
+    end
+  end
+end
