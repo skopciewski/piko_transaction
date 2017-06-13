@@ -31,7 +31,7 @@ module PikoTransaction
     def method_missing(method_name, *args, &block)
       logger.debug { format "Looking for transaction '%s'", method_name }
       return super unless valid_method_name?(method_name)
-      @transactions[method_name] ||= Transaction.new
+      @transactions[method_name] ||= Transaction.new method_name
     end
 
     private
