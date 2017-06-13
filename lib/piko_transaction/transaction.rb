@@ -23,41 +23,47 @@ module PikoTransaction
   class Transaction
     include Logger
 
-    def initialize
+    def initialize(name = nil)
+      @name = name
       @commands = []
       @done = []
       yield self if block_given?
     end
 
     def add(command)
-      logger.debug { format "Add command: %s", command.class.name }
       @commands << command
+      logger.debug do
+        format "%s Added command: %s, total: %i", to_s, command.to_s, @commands.count
+      end
     end
 
     def do
-      logger.info { format "Start transaction with commands: %s", @commands.count }
+      logger.info { format "%s Start transaction with commands: %s", to_s, @commands.count }
       return true if run_commands
       terminate_and_undo
     end
 
     def undo
-      logger.info { format "Rolling back transaction with commands: %s", @done.count }
+      logger.info { format "%s Rolling back transaction with commands: %s", to_s, @done.count }
       undo_done_commands
+    end
+
+    def to_s
+      format "[%s]", @name || "tr"
     end
 
     private
 
     def terminate_and_undo
-      logger.error { "Could not finalize transaction!" }
+      logger.error { format "%s Could not finalize transaction!", to_s }
       undo_done_commands
       false
     end
 
     def run_commands
-      @commands.each do |cmd|
-        logger.debug { format "Do: %s", cmd.class.name }
-        unless cmd.do
-          logger.error { "Command execution failed" }
+      @commands.each_with_index do |cmd, i|
+        unless doing_command(cmd, i)
+          logger.warn { format "%s Command %s failed", to_s, cmd.to_s }
           return false
         end
         @done << cmd
@@ -65,14 +71,24 @@ module PikoTransaction
       true
     end
 
+    def doing_command(cmd, i)
+      logger.debug { format "%s Running %i command: %s", to_s, i + 1, cmd.to_s }
+      cmd.do
+    end
+
     def undo_done_commands
-      @done.reverse.each do |cmd|
-        logger.debug { format "Undo: %s", cmd.class.name }
-        unless cmd.undo
-          logger.fatal { "Can not undo command" }
+      @done.each_with_index.reverse_each do |cmd, i|
+        unless undoing_command(cmd, i)
+          logger.fatal { format "%s Can not undo command: %s", to_s, cmd.to_s }
           break
         end
+        @done.delete(cmd)
       end
+    end
+
+    def undoing_command(cmd, i)
+      logger.debug { format "%s Undoing %i command: %s", to_s, i + 1, cmd.to_s }
+      cmd.undo
     end
   end
 end

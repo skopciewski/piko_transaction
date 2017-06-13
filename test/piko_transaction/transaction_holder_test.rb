@@ -25,5 +25,10 @@ module PikoTransaction
     def test_that_it_do_not_accepts_othe_names
       refute_respond_to @th, "boo bar"
     end
+
+    def test_that_created_transaction_has_name
+      tr = @th.foo
+      assert_equal "[foo]", tr.to_s
+    end
   end
 end

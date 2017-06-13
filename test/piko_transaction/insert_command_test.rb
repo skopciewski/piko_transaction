@@ -79,5 +79,30 @@ module PikoTransaction
       @cmd.undo
       assert_mock @collection
     end
+
+    def test_that_command_has_default_string_representaton
+      assert_equal "[insert_cmd]", @cmd.to_s
+    end
+
+    def test_that_command_has_name
+      @cmd.name :foo_bar
+      assert_equal "[foo_bar]", @cmd.to_s
+    end
+
+    def test_that_it_is_possible_to_add_more_success_observers
+      spy2 = nil
+      @collection.expect(:insert_document, true) { |_, &b| b.call(:the_id) }
+      @cmd.add_success_callback(proc { |res| spy2 = res })
+      @cmd.do
+      assert @spy == :the_id && spy2 == :the_id
+    end
+
+    def test_that_it_is_possible_to_add_failure_observers
+      spy = nil
+      @collection.expect :insert_document, false, [Object]
+      @cmd.add_failure_callback(proc { spy = :failure })
+      @cmd.do
+      assert @spy == :unknown && spy == :failure
+    end
   end
 end
