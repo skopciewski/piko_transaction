@@ -32,11 +32,28 @@ module PikoTransaction
     end
   end
 
+  class CountCommand
+    attr_accessor :done, :undone
+
+    def initialize
+      @done = @undone = 0
+    end
+
+    def do
+      @done += 1
+    end
+
+    def undo
+      @undone += 1
+    end
+  end
+
   class TransactionTest < Minitest::Test
     def setup
       @transaction = Transaction.new
       @cmd1 = TestCommand.new
       @cmd2 = TestCommand.new
+      @ccmd = CountCommand.new
       @cmd_bad = TestBadCommand.new
       @cmd_bad_undo = TestBadUndo.new
     end
@@ -58,6 +75,16 @@ module PikoTransaction
       @transaction.add @cmd2
       @transaction.do
       refute @cmd1.undone && @cmd2.undone
+    end
+
+    def test_that_transaction_can_do_after_undo
+      @transaction.add @ccmd
+      @transaction.add @cmd1
+      @transaction.do
+      @transaction.undo
+      @transaction.do
+      @transaction.undo
+      assert @ccmd.done == 2 && @ccmd.undone == 2
     end
 
     def test_that_transaction_undo_first_command_when_the_second_is_bad
@@ -134,6 +161,16 @@ module PikoTransaction
       @transaction.add transaction2
       @transaction.do
       assert @cmd1.done && @cmd2.done
+    end
+
+    def test_that_transaction_has_default_string_representation
+      transaction = Transaction.new
+      assert_equal "[tr]", transaction.to_s
+    end
+
+    def test_that_transaction_has_string_representation
+      transaction = Transaction.new :foo_bar
+      assert_equal "[foo_bar]", transaction.to_s
     end
   end
 end
