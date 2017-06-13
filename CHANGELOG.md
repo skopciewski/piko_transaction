@@ -1,3 +1,9 @@
+### 3.0.0 (2017.06.13)
+
+* allow to register success and failure observers in commands
+* commands and transactions have names
+* improved logger
+
 ### 2.1.0 (2017.06.08)
 
 * add transaction holder class
