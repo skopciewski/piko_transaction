@@ -9,8 +9,8 @@ install:
   - docker build -t thegem .
 
 script:
-  - docker run -it --rm -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec rake
-  - docker run -it --rm -e CODECLIMATE_REPO_TOKEN=$CC -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec codeclimate-test-reporter
+  - sudo docker run -it --rm -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec rake
+  - sudo docker run -it --rm -e CODECLIMATE_REPO_TOKEN=$CC -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec codeclimate-test-reporter
 
 deploy:
   provider: rubygems

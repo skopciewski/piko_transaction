@@ -1,3 +1,7 @@
+### 3.0.2 (2017.07.04)
+
+* fix travis build
+
 ### 3.0.1 (2017.07.04)
 
 * extract Command class to reuse some code
