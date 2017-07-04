@@ -17,19 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require "piko_transaction/logger"
+require "piko_transaction/command"
 
 module PikoTransaction
-  class CustomCommand
-    include Logger
-
+  class CustomCommand < Command
     def initialize(do_action = nil, undo_action = nil, &alternative_do_action)
-      @name = nil
+      super()
       @do_action = choose_do_action(do_action, alternative_do_action)
       @undo_action = undo_action
-      @success_callbacks = []
-      @failure_callbacks = []
-      @done = false
     end
 
     def do
@@ -40,50 +35,10 @@ module PikoTransaction
       execute_undo_action
     end
 
-    def to_s
-      format "[%s]", @name || "custom_cmd"
-    end
-
-    def name(value)
-      @name = value.to_s
-    end
-
-    def add_success_callback(callback)
-      @success_callbacks << callback if callback.respond_to?(:call)
-      logger.debug { format "%s Registered success callbacks: %i", to_s, @success_callbacks.count }
-    end
-
-    def add_failure_callback(callback)
-      @failure_callbacks << callback if callback.respond_to?(:call)
-      logger.debug { format "%s Registered failure callbacks: %i", to_s, @failure_callbacks.count }
-    end
-
     private
 
     def choose_do_action(action, alternative_action)
       action || alternative_action
-    end
-
-    def terminate(msg)
-      logger.warn { format "%s %s", to_s, msg }
-      false
-    end
-
-    def mark_as_done
-      @done = true
-    end
-
-    def mark_as_undone
-      @done = false
-      true
-    end
-
-    def can_do?
-      !@done
-    end
-
-    def can_undo?
-      @done
     end
 
     def execute_do_action
@@ -133,14 +88,6 @@ module PikoTransaction
         callback.call
       end
       true
-    end
-
-    def call_failure_callbacks
-      @failure_callbacks.each_with_index do |callback, i|
-        logger.debug { format "%s Run %i failure callback", to_s, i + 1 }
-        callback.call
-      end
-      false
     end
   end
 end

@@ -97,7 +97,7 @@ module PikoTransaction
     end
 
     def test_that_command_has_default_string_representaton
-      assert_equal "[custom_cmd]", @cmd.to_s
+      assert_equal "[CustomCommand]", @cmd.to_s
     end
 
     def test_that_command_has_name
