@@ -1,3 +1,7 @@
+### 3.0.1 (2017.07.04)
+
+* extract Command class to reuse some code
+
 ### 3.0.0 (2017.06.13)
 
 * allow to register success and failure observers in commands

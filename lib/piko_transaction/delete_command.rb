@@ -17,21 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require "piko_transaction/logger"
+require "piko_transaction/command"
 
 module PikoTransaction
-  class DeleteCommand
-    include Logger
-
+  class DeleteCommand < Command
     def initialize(document_id, collection, &success_action)
-      @name = nil
+      super()
       @document_id = document_id
       @collection = collection
       @success_action = success_action
-      @success_callbacks = []
-      @failure_callbacks = []
       @deleted_doc = nil
-      @done = false
     end
 
     def do
@@ -43,47 +38,7 @@ module PikoTransaction
       store_document
     end
 
-    def to_s
-      format "[%s]", @name || "delete_cmd"
-    end
-
-    def name(value)
-      @name = value.to_s
-    end
-
-    def add_success_callback(callback)
-      @success_callbacks << callback if callback.respond_to?(:call)
-      logger.debug { format "%s Registered success callbacks: %s", to_s, @success_callbacks.count }
-    end
-
-    def add_failure_callback(callback)
-      @failure_callbacks << callback if callback.respond_to?(:call)
-      logger.debug { format "%s Registered failure callbacks: %s", to_s, @failure_callbacks.count }
-    end
-
     private
-
-    def terminate(msg)
-      logger.warn { format "%s %s", to_s, msg }
-      false
-    end
-
-    def mark_as_done
-      @done = true
-    end
-
-    def mark_as_undone
-      @done = false
-      true
-    end
-
-    def can_do?
-      !@done
-    end
-
-    def can_undo?
-      @done
-    end
 
     def remove_document
       return terminate("Command already done") unless can_do?
@@ -115,14 +70,6 @@ module PikoTransaction
         callback.call(@deleted_doc)
       end
       true
-    end
-
-    def call_failure_callbacks
-      @failure_callbacks.each_with_index do |callback, i|
-        logger.debug { format "%s Run %i failure callback", to_s, i + 1 }
-        callback.call
-      end
-      false
     end
   end
 end
