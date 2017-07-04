@@ -6,9 +6,10 @@ services:
 before_install:
   - git checkout -qf $TRAVIS_BRANCH
 install:
-  - docker build -t thegem --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+  - docker build -t thegem .
 
 script:
+  - chmod 666 $TRAVIS_BUILD_DIR/Gemfile.lock
   - docker run -it --rm -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec rake
   - docker run -it --rm -e CODECLIMATE_REPO_TOKEN=$CC -v $TRAVIS_BUILD_DIR:/opt/project/code thegem bundle exec codeclimate-test-reporter
 
